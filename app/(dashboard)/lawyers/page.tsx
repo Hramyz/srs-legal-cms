@@ -22,17 +22,26 @@ interface Lawyer {
 export default function LawyersPage() {
   const [lawyers, setLawyers] = useState<Lawyer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const fetchLawyers = useCallback(async () => {
     setIsLoading(true);
-    const res = await fetch(`/api/lawyers?search=${search}`);
-    if (res.ok) {
-      const data = await res.json();
-      setLawyers(data);
+    setFetchError(null);
+    try {
+      const res = await fetch(`/api/lawyers?search=${search}`);
+      if (res.ok) {
+        const data = await res.json();
+        setLawyers(data);
+      } else {
+        setFetchError("Failed to load lawyers.");
+      }
+    } catch {
+      setFetchError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [search]);
 
   useEffect(() => {
@@ -72,6 +81,8 @@ export default function LawyersPage() {
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-gray-400 text-sm">Loading...</div>
+          ) : fetchError ? (
+            <div className="p-8 text-center text-red-400 text-sm">{fetchError}</div>
           ) : lawyers.length === 0 ? (
             <div className="p-8 text-center text-gray-400 text-sm">No lawyers found</div>
           ) : (

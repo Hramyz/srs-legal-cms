@@ -32,12 +32,14 @@ const SPECIALIZATIONS = ["Criminal Law", "Civil Law", "Family Law", "Corporate L
 
 export default function AddLawyerModal({ isOpen, onClose, onSuccess }: AddLawyerModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<LawyerFormData>({
     resolver: zodResolver(lawyerSchema),
   });
 
   const onSubmit = async (data: LawyerFormData) => {
     setIsLoading(true);
+    setSubmitError(null);
     try {
       const res = await fetch("/api/lawyers", {
         method: "POST",
@@ -52,7 +54,12 @@ export default function AddLawyerModal({ isOpen, onClose, onSuccess }: AddLawyer
         reset();
         onClose();
         onSuccess?.();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setSubmitError(body?.error ?? "Failed to add lawyer. Please try again.");
       }
+    } catch {
+      setSubmitError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +135,8 @@ export default function AddLawyerModal({ isOpen, onClose, onSuccess }: AddLawyer
           <label className={labelClass}>Bio</label>
           <textarea {...register("bio")} rows={3} className={inputClass} placeholder="Professional biography" />
         </div>
+
+        {submitError && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{submitError}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>

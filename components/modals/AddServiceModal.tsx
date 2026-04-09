@@ -27,12 +27,14 @@ interface AddServiceModalProps {
 
 export default function AddServiceModal({ isOpen, onClose, onSuccess, categories = [] }: AddServiceModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
   });
 
   const onSubmit = async (data: ServiceFormData) => {
     setIsLoading(true);
+    setSubmitError(null);
     try {
       const res = await fetch("/api/services", {
         method: "POST",
@@ -43,7 +45,12 @@ export default function AddServiceModal({ isOpen, onClose, onSuccess, categories
         reset();
         onClose();
         onSuccess?.();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setSubmitError(body?.error ?? "Failed to add service. Please try again.");
       }
+    } catch {
+      setSubmitError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +99,8 @@ export default function AddServiceModal({ isOpen, onClose, onSuccess, categories
           <label className={labelClass}>Description</label>
           <textarea {...register("description")} rows={3} className={inputClass} placeholder="Service description" />
         </div>
+
+        {submitError && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{submitError}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>

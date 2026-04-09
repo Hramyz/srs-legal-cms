@@ -27,12 +27,14 @@ const ROLES = ["super_admin", "admin", "lawyer", "junior_lawyer", "paralegal", "
 
 export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
   });
 
   const onSubmit = async (data: UserFormData) => {
     setIsLoading(true);
+    setSubmitError(null);
     try {
       const res = await fetch("/api/users", {
         method: "POST",
@@ -46,7 +48,12 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
         reset();
         onClose();
         onSuccess?.();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setSubmitError(body?.error ?? "Failed to add user. Please try again.");
       }
+    } catch {
+      setSubmitError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -89,6 +96,8 @@ export default function AddUserModal({ isOpen, onClose, onSuccess }: AddUserModa
             <input {...register("hourlyRate")} type="number" className={inputClass} placeholder="200" />
           </div>
         </div>
+
+        {submitError && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{submitError}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
