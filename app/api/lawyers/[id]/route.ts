@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const lawyer = await prisma.lawyer.update({
-      where: { id: params.id },
+      where: { id },
       data: body,
     });
     return NextResponse.json(lawyer);
@@ -19,10 +20,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await prisma.lawyer.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.lawyer.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete lawyer" }, { status: 500 });
