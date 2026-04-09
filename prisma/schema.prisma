@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  name        String
+  email       String    @unique
+  password    String
+  role        String    @default("viewer")
+  hourlyRate  Float?
+  isActive    Boolean   @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Client {
+  id               String   @id @default(cuid())
+  clientId         String   @unique
+  firstName        String
+  lastName         String
+  email            String
+  phone            String?
+  address          String?
+  city             String?
+  country          String?
+  notes            String?
+  registrationMode String   @default("offline")
+  isOnline         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}
+
+model Case {
+  id              String   @id @default(cuid())
+  caseNumber      String   @unique
+  title           String
+  description     String?
+  type            String
+  status          String   @default("Pending")
+  estimatedValue  Float?
+  filingDate      DateTime
+  clientId        String?
+  assignedTo      String?
+  court           String?
+  judge           String?
+  opposingCounsel String?
+  notes           String?
+  createdAt       DateTime @default(now())
+}
+
+model Lawyer {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phone             String?
+  licenseNumber     String?
+  specialization    String?
+  yearsOfExperience Int?
+  hourlyRate        Float?
+  barAssociation    String?
+  bio               String?
+  status            String   @default("Pending")
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  clientId      String?
+  caseId        String?
+  amount        Float
+  status        String    @default("Pending")
+  issueDate     DateTime
+  dueDate       DateTime?
+  description   String?
+  billableHours Float?
+  hourlyRate    Float?
+  expenses      Float?
+  tax           Float?
+  discount      Float?
+  notes         String?
+  createdAt     DateTime  @default(now())
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  orderNumber   String    @unique
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  serviceId     String?
+  bookingDate   DateTime?
+  bookingTime   String?
+  amount        Float
+  status        String    @default("Pending")
+  paymentStatus String    @default("Pending")
+  notes         String?
+  createdAt     DateTime  @default(now())
+}
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  services    Service[]
+  createdAt   DateTime  @default(now())
+}
+
+model Service {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  description     String?
+  categoryId      String?
+  category        ServiceCategory? @relation(fields: [categoryId], references: [id])
+  price           Float
+  icon            String?
+  duration        String?
+  h1Tag           String?
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImageUrl      String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  filename     String
+  fileSize     String?
+  documentType String
+  description  String?
+  caseId       String?
+  clientId     String?
+  tags         String?
+  uploadedAt   DateTime @default(now())
+}
+
+model CalendarEvent {
+  id                  String   @id @default(cuid())
+  title               String
+  description         String?
+  eventType           String   @default("Meeting")
+  caseId              String?
+  startDateTime       DateTime
+  duration            String   @default("1 hour")
+  isAllDay            Boolean  @default(false)
+  googleMeetLink      Boolean  @default(false)
+  location            String?
+  attendees           String?
+  reminder            String   @default("30 minutes before")
+  isConsultationOrder Boolean  @default(false)
+  createdAt           DateTime @default(now())
+}
+
+model Enquiry {
+  id         String   @id @default(cuid())
+  clientName String
+  email      String
+  phone      String?
+  subject    String?
+  message    String?
+  status     String   @default("Pending")
+  createdAt  DateTime @default(now())
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  permissions Json     @default("{}")
+  createdAt   DateTime @default(now())
+}
