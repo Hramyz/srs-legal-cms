@@ -20,20 +20,21 @@ export function formatDate(date: Date | string): string {
   }).format(new Date(date));
 }
 
+const STATUS_COLOR_MAP: Record<string, string> = {
+  Active: "bg-green-100 text-green-800",
+  Confirmed: "bg-green-100 text-green-800",
+  Completed: "bg-green-100 text-green-800",
+  Approved: "bg-green-100 text-green-800",
+  Paid: "bg-green-100 text-green-800",
+  Pending: "bg-yellow-100 text-yellow-800",
+  "In Progress": "bg-blue-100 text-blue-800",
+  Inactive: "bg-red-100 text-red-800",
+  Rejected: "bg-red-100 text-red-800",
+  Closed: "bg-red-100 text-red-800",
+  Cancelled: "bg-red-100 text-red-800",
+  Overdue: "bg-red-100 text-red-800",
+};
+
 export function getStatusColor(status: string): string {
-  const statusMap: Record<string, string> = {
-    Active: "bg-green-100 text-green-800",
-    Confirmed: "bg-green-100 text-green-800",
-    Completed: "bg-green-100 text-green-800",
-    Approved: "bg-green-100 text-green-800",
-    Paid: "bg-green-100 text-green-800",
-    Pending: "bg-yellow-100 text-yellow-800",
-    "In Progress": "bg-blue-100 text-blue-800",
-    Inactive: "bg-red-100 text-red-800",
-    Rejected: "bg-red-100 text-red-800",
-    Closed: "bg-red-100 text-red-800",
-    Cancelled: "bg-red-100 text-red-800",
-    Overdue: "bg-red-100 text-red-800",
-  };
-  return statusMap[status] || "bg-gray-100 text-gray-800";
+  return STATUS_COLOR_MAP[status] || "bg-gray-100 text-gray-800";
 }

@@ -83,7 +83,7 @@ export default function ClientsPage() {
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Phone</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Location</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
                 </tr>
               </thead>
